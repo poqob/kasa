@@ -24,3 +24,6 @@ class ModelSalt(Base):
             method=data.get("method"),
             salt=data.get("salt"),
         )
+    
+    def __repr__(self):
+        return f"ModelSalt(id={self.id}, method={self.method}, salt={self.salt})"
