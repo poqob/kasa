@@ -1,4 +1,5 @@
 from src.repository.cipherRepository import CipherRepository,ModelCipher
+from src.repository.sqlite import SqliteRepository
 from src.cyrpto.encryptor import Encryptor
 from src.cyrpto.decrptor import Decryptor
 from src.repository.saltRepository import SaltRepository,ModelSalt
@@ -7,10 +8,14 @@ from src.utils.enviroment_variable import read_env_file
 from src.cyrpto.salt import Salt
 from datetime import datetime,timedelta
 from src.utils.cache_manager import CacheManager
+from src.services.saltService import SaltService
+
+from tests.test_salt import  list_all_salts, salt_create_test, salt_service_test,generate_salt_test
+
 
 def cipher_db_test():
     sql=read_env_file().get('sqlite_db_path')
-    repo = CipherRepository(sqlite_path=sql)
+    repo = SqliteRepository(db_url=f'sqlite:///{sql}', model_name='cipher')
 
     salt = Salt(method="sha256")
     key = salt.apply_salt(secret_key="poqob")
@@ -62,6 +67,7 @@ def cache_manager_test():
         cm.flush_cache()
         cm.sync()
 
+
+
 if __name__ == "__main__":
-    cache_manager_test()
-    session_db_test()
+    generate_salt_test()
