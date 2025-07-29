@@ -319,7 +319,7 @@ class CipherService:
                 raise ValueError(f"First salt with ID {first_salt_id} not found in database. Please create a salt first.")
             
             # Use the salt ID as the cipher key
-            cipher_key = str(first_salt_id)
+            cipher_key = str(salt_info)
             
             self.logger.info(f"Using first salt ID ({first_salt_id}) as cipher key")
             
