@@ -379,7 +379,7 @@ class CipherService:
                 raise ValueError(f"First salt with ID {first_salt_id} not found. Cannot decrypt cipher.")
             
             # Decrypt using the first salt ID as key
-            plaintext = self.decrypt_cipher(cipher_id, cipher_key)
+            plaintext = self.decrypt_cipher(cipher_id, salt_info)
             
             self.logger.debug(f"Cipher decrypted using first salt key. Cipher ID: {cipher_id}, Salt ID used: {first_salt_id}")
             return plaintext
