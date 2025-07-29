@@ -387,6 +387,101 @@ class CipherService:
         except Exception as e:
             self.logger.error(f"Failed to decrypt cipher with first salt key: {str(e)}")
             raise Exception(f"Cipher decryption with first salt key failed: {str(e)}")
+    
+    def decrypt_cipher_by_name_with_first_salt_key(self, cipher_name: str) -> Dict[str, Any]:
+        """
+        Search for a cipher by name and decrypt it using the first salt key.
+        
+        Args:
+            cipher_name (str): Name or partial name of the cipher to search and decrypt
+            
+        Returns:
+            Dict[str, Any]: Contains decrypted_text, cipher_info, and search_results
+            
+        Raises:
+            ValueError: If no cipher found or multiple ciphers found
+            Exception: If decryption process fails
+        """
+        try:
+            # Search for ciphers with matching name
+            matching_ciphers = self.search_ciphers_by_name(cipher_name)
+            
+            if not matching_ciphers:
+                raise ValueError(f"No ciphers found with name containing '{cipher_name}'")
+            
+            if len(matching_ciphers) > 1:
+                # Multiple matches found - return information for user to choose
+                cipher_list = []
+                for cipher in matching_ciphers:
+                    cipher_list.append({
+                        "id": cipher["id"],
+                        "name": cipher["name"], 
+                        "method": cipher["method"]
+                    })
+                
+                raise ValueError(f"Multiple ciphers found ({len(matching_ciphers)}). Please be more specific. Found: {cipher_list}")
+            
+            # Single match found - decrypt it
+            cipher = matching_ciphers[0]
+            cipher_id = cipher["id"]
+            
+            if cipher["name"] != cipher_name:
+                raise ValueError(f"Cipher name '{cipher_name}' does not match any existing cipher. Proceeding with decryption.")
+
+            
+            self.logger.info(f"Found single cipher match: '{cipher['name']}' (ID: {cipher_id})")
+            
+            # Decrypt using first salt key
+            decrypted_text = self.decrypt_cipher_with_first_salt_key(cipher_id)
+            
+            result = {
+                "decrypted_text": decrypted_text,
+                "cipher_info": cipher,
+                "cipher_id": cipher_id,
+                "cipher_name": cipher["name"],
+                "method": cipher["method"],
+                "search_term": cipher_name,
+                "matches_found": 1
+            }
+            
+            self.logger.info(f"Successfully decrypted cipher '{cipher['name']}' using first salt key")
+            return result
+            
+        except ValueError as e:
+            self.logger.error(f"Cipher search/decrypt by name failed: {str(e)}")
+            raise
+        except Exception as e:
+            self.logger.error(f"Failed to decrypt cipher by name with first salt key: {str(e)}")
+            raise Exception(f"Cipher decrypt by name failed: {str(e)}")
+    
+    def get_cipher_suggestions_by_name(self, cipher_name: str) -> List[Dict[str, Any]]:
+        """
+        Get cipher suggestions by name for cases with multiple matches.
+        This is a helper method for decrypt_cipher_by_name_with_first_salt_key.
+        
+        Args:
+            cipher_name (str): Name or partial name to search for
+            
+        Returns:
+            List[Dict[str, Any]]: List of cipher suggestions with essential info
+        """
+        try:
+            matching_ciphers = self.search_ciphers_by_name(cipher_name)
+            
+            suggestions = []
+            for cipher in matching_ciphers:
+                suggestions.append({
+                    "id": cipher["id"],
+                    "name": cipher["name"],
+                    "method": cipher["method"],
+                    "encrypted_preview": cipher.get("encrypted_cipher", "")[:20] + "..."
+                })
+            
+            return suggestions
+            
+        except Exception as e:
+            self.logger.error(f"Failed to get cipher suggestions: {str(e)}")
+            return []
 
 
 # Example usage and testing
@@ -447,6 +542,14 @@ if __name__ == "__main__":
                 cipher_id=first_salt_result["cipher_id"]
             )
             print(f"Decrypted first salt text: {decrypted_first_salt}")
+            
+            # Test decrypt by name with first salt key
+            try:
+                decrypt_by_name_result = service.decrypt_cipher_by_name_with_first_salt_key("first_salt_test")
+                print(f"Decrypt by name result: {decrypt_by_name_result['decrypted_text']}")
+                print(f"Found cipher: {decrypt_by_name_result['cipher_name']} (ID: {decrypt_by_name_result['cipher_id']})")
+            except ValueError as name_error:
+                print(f"Decrypt by name error: {name_error}")
             
         except ValueError as ve:
             print(f"First salt method error (this is expected if no salt with ID 1 exists): {ve}")
