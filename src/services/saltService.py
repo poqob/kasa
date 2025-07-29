@@ -123,7 +123,20 @@ class SaltService:
             self.logger.error(f"Unexpected error during salt application: {str(e)}")
             raise Exception(f"Salt application failed: {str(e)}")
     
-
+    def delete_all_salts(self) -> bool:
+        """
+        Delete all salts from the repository.
+        
+        Returns:
+            bool: True if deletion successful, False otherwise
+        """
+        try:
+            self.repository.delete_all()
+            self.logger.info("All salts deleted successfully")
+            return True
+        except Exception as e:
+            self.logger.error(f"Failed to delete all salts: {str(e)}")
+            return False
     
     def delete_salt(self, salt_id: int) -> bool:
         """

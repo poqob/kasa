@@ -53,6 +53,13 @@ class SaltRepository(Repository):
         session.close()
         self.redis.delete(f"salt:{index}")
 
+    def delete_all(self):
+        session = self.Session()
+        session.query(ModelSalt).delete()
+        session.commit()
+        session.close()
+        self.redis.flushdb()
+
     def get_all(self):
         session = self.Session()
         salts = session.query(ModelSalt).all()
