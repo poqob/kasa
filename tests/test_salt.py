@@ -3,6 +3,7 @@ from src.repository.sqlite import SqliteRepository
 from src.services.saltService import SaltService
 from src.utils.enviroment_variable import read_env_file
 from src.cyrpto.salt import Salt
+from src.services.cipherService import CipherService
 
 def salt_create_test(method="sha256", secret_key="poqob"):
     salt = Salt(method=method)

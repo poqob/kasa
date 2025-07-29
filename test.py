@@ -11,7 +11,7 @@ from src.utils.cache_manager import CacheManager
 from src.services.saltService import SaltService
 
 from tests.test_salt import  list_all_salts, salt_create_test, salt_service_test,generate_salt_test
-
+from tests.test_cipher import cipher_service_test, test_cipher_with_first_salt_comprehensive, test_first_salt_key_cipher
 
 def cipher_db_test():
     sql=read_env_file().get('sqlite_db_path')
@@ -70,4 +70,11 @@ def cache_manager_test():
 
 
 if __name__ == "__main__":
-    generate_salt_test()
+    # Run basic cipher service test
+    cipher_service_test()
+    
+    # Run first salt key cipher tests
+    test_first_salt_key_cipher()
+    
+    # Run comprehensive tests
+    test_cipher_with_first_salt_comprehensive()
