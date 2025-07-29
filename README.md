@@ -65,12 +65,14 @@ cd kasa
 # Install dependencies
 pip install -r requirements.txt
 
+# Create database directory
+mkdir -p db
+
 # Start Redis server (make sure Redis is running)
 redis-server
-
-# Initialize the database
-python -c "from src.repository.sqlite import SqliteRepository; SqliteRepository()"
 ```
+
+**Note**: The SQLite database (`db/kasa.db`) and tables will be created automatically when you first run the API server or CLI application.
 
 ## 🔧 Configuration
 
